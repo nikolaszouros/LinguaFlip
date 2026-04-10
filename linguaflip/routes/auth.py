@@ -20,7 +20,7 @@ def login():
         session.clear()
         session['user_id'] = int(user.id)
         flash(f'Welcome back, {user.username}!', 'success')
-        return redirect(url_for('decks.index'))
+        return redirect(url_for('index'))
     return render_template('auth/login.html')
 
 

@@ -32,6 +32,8 @@ def index():
     db = get_db()
 
     if request.method == 'POST':
+        action = request.form.get('action', '')
+
         # --- Profile picture upload ---
         if 'profile_pic' in request.files and request.files['profile_pic'].filename:
             file = request.files['profile_pic']
@@ -46,6 +48,28 @@ def index():
                 db.execute('UPDATE users SET profile_pic = %s WHERE id = %s', (filename, user.id))
                 db.commit()
                 flash('Profile picture updated.', 'success')
+            return redirect(url_for('profile.index'))
+
+        # --- Username change ---
+        if action == 'change_username':
+            new_username = request.form.get('new_username', '').strip()
+            if not new_username:
+                flash('Username cannot be empty.', 'error')
+            elif len(new_username) < 3:
+                flash('Username must be at least 3 characters.', 'error')
+            elif new_username == user.username:
+                flash('That is already your username.', 'error')
+            else:
+                try:
+                    db.execute('UPDATE users SET username = %s WHERE id = %s',
+                               (new_username, user.id))
+                    db.commit()
+                    flash('Username updated.', 'success')
+                except Exception as e:
+                    if 'unique' in str(e).lower() or 'UNIQUE' in str(e):
+                        flash('Username already taken.', 'error')
+                    else:
+                        flash('Could not update username.', 'error')
             return redirect(url_for('profile.index'))
 
         # --- Native language update ---

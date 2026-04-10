@@ -120,6 +120,7 @@ def delete(deck_id):
 @decks.route('/dashboard')
 @login_required
 def dashboard():
+    import json
     user = g.current_user
     db = get_db()
 
@@ -175,11 +176,54 @@ def dashboard():
                 streak += 1
                 expected = expected - timedelta(days=1)
             elif d == today - timedelta(days=1) and streak == 0:
-                # allow yesterday as start if no test today
                 streak += 1
                 expected = d - timedelta(days=1)
             else:
                 break
+
+    # --- Chart data ---
+
+    # Score trend: last 30 tests in chronological order
+    trend_rows = db.execute(
+        'SELECT ts.score, ts.total, ts.taken_at, d.name AS deck_name '
+        'FROM test_sessions ts JOIN decks d ON ts.deck_id = d.id '
+        'WHERE ts.user_id = %s ORDER BY ts.taken_at ASC LIMIT 30',
+        (user.id,)
+    ).fetchall()
+
+    trend_labels = []
+    trend_scores = []
+    for tr in trend_rows:
+        pct = round(tr['score'] / tr['total'] * 100) if tr['total'] > 0 else 0
+        trend_labels.append(tr['taken_at'].strftime('%d/%m'))
+        trend_scores.append(pct)
+
+    # Per-deck performance: avg and best score %
+    deck_perf_rows = db.execute(
+        'SELECT d.name, '
+        '  ROUND(AVG(ts.score::numeric / NULLIF(ts.total,0) * 100)) AS avg_pct, '
+        '  ROUND(MAX(ts.score::numeric / NULLIF(ts.total,0) * 100)) AS best_pct, '
+        '  COUNT(ts.id) AS test_count '
+        'FROM decks d '
+        'LEFT JOIN test_sessions ts ON ts.deck_id = d.id AND ts.user_id = %s '
+        'WHERE d.user_id = %s '
+        'GROUP BY d.id, d.name ORDER BY d.name',
+        (user.id, user.id)
+    ).fetchall()
+
+    deck_labels = []
+    deck_avg = []
+    deck_best = []
+    for dr in deck_perf_rows:
+        if dr['test_count'] and int(dr['test_count']) > 0:
+            deck_labels.append(dr['name'])
+            deck_avg.append(float(dr['avg_pct'] or 0))
+            deck_best.append(float(dr['best_pct'] or 0))
+
+    chart_data = json.dumps({
+        'trend': {'labels': trend_labels, 'scores': trend_scores},
+        'decks': {'labels': deck_labels, 'avg': deck_avg, 'best': deck_best}
+    })
 
     return render_template(
         'dashboard/index.html',
@@ -187,5 +231,8 @@ def dashboard():
         total_decks=total_decks,
         history=history,
         streak=streak,
-        user=user
+        user=user,
+        chart_data=chart_data,
+        has_trend=len(trend_labels) > 0,
+        has_deck_chart=len(deck_labels) > 0
     )

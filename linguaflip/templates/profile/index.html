@@ -54,6 +54,18 @@
             <span class="profile-field__label">Email</span>
             <span class="profile-field__value">{{ user.email }}</span>
         </div>
+        <details style="margin-top:1rem">
+            <summary style="cursor:pointer;color:var(--blue);font-size:0.875rem;user-select:none">Change username</summary>
+            <form method="post" style="margin-top:0.75rem">
+                <input type="hidden" name="action" value="change_username">
+                <div class="form-group">
+                    <label for="new_username" class="form-label">New username</label>
+                    <input type="text" id="new_username" name="new_username" class="form-input"
+                           placeholder="{{ user.username }}" minlength="3" required>
+                </div>
+                <button type="submit" class="btn btn--primary btn--sm" style="margin-top:0.5rem">Save Username</button>
+            </form>
+        </details>
     </div>
 
     <div class="profile-card">
