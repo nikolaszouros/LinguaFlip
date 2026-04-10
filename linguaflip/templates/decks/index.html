@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}My Decks - LinguaFlip{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>My Decks</h1>
+    <a href="{{ url_for('decks.new') }}" class="btn btn--primary">+ New Deck</a>
+</div>
+
+{% if decks_with_stats %}
+    <div class="deck-grid">
+        {% for item in decks_with_stats %}
+        <div class="deck-card">
+            <div class="deck-card__header">
+                <h2 class="deck-card__name">{{ item.deck.name }}</h2>
+                <span class="deck-card__langs">{{ item.source_name }} &rarr; {{ item.target_name }}</span>
+            </div>
+            <div class="deck-card__stats">
+                <div class="stat">
+                    <span class="stat__value">{{ item.stats.card_count }}</span>
+                    <span class="stat__label">Cards</span>
+                </div>
+                <div class="stat">
+                    <span class="stat__value">{{ item.stats.test_count }}</span>
+                    <span class="stat__label">Tests</span>
+                </div>
+                <div class="stat">
+                    {% if item.stats.best_score is not none %}
+                        <span class="stat__value">{{ item.stats.best_score }}%</span>
+                    {% else %}
+                        <span class="stat__value">—</span>
+                    {% endif %}
+                    <span class="stat__label">Best</span>
+                </div>
+                <div class="stat">
+                    {% if item.stats.last_score is not none %}
+                        <span class="stat__value">{{ item.stats.last_score }}%</span>
+                    {% else %}
+                        <span class="stat__value">—</span>
+                    {% endif %}
+                    <span class="stat__label">Last</span>
+                </div>
+            </div>
+            <div class="deck-card__actions">
+                <a href="{{ url_for('decks.detail', deck_id=item.deck.id) }}" class="btn btn--secondary btn--sm">View</a>
+                <a href="{{ url_for('study.index', deck_id=item.deck.id) }}" class="btn btn--primary btn--sm">Study</a>
+                <a href="{{ url_for('test_bp.index', deck_id=item.deck.id) }}" class="btn btn--secondary btn--sm">Test</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <p>You don't have any decks yet.</p>
+        <a href="{{ url_for('decks.new') }}" class="btn btn--primary">Create your first deck</a>
+    </div>
+{% endif %}
+{% endblock %}

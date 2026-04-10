@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LinguaFlip{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="nav-logo">
+                <svg width="30" height="28" viewBox="0 0 30 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- Back flashcard -->
+                    <rect x="0" y="2" width="20" height="13" rx="2.5" fill="#1565C0" transform="rotate(-14, 10, 8.5)"/>
+                    <!-- Front flashcard -->
+                    <g transform="rotate(-5, 17, 15.5)">
+                        <rect x="7" y="9" width="20" height="13" rx="2.5" fill="#2791F5"/>
+                        <rect x="10" y="14" width="11" height="1.5" rx="0.75" fill="rgba(255,255,255,0.4)"/>
+                        <rect x="10" y="17" width="7" height="1.2" rx="0.6" fill="rgba(255,255,255,0.25)"/>
+                    </g>
+                </svg>
+                LinguaFlip
+            </a>
+            <div class="nav-links">
+                {% if current_user %}
+                    <a href="{{ url_for('decks.index') }}" class="nav-link">Decks</a>
+                    <a href="{{ url_for('decks.dashboard') }}" class="nav-link">Dashboard</a>
+                    <a href="{{ url_for('profile.index') }}" class="nav-user nav-user--link">
+                        {% if current_user.profile_pic %}
+                        <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_pic) }}"
+                             class="nav-user__pic" alt="">
+                        {% endif %}
+                        {{ current_user.username }}
+                    </a>
+                    <a href="{{ url_for('auth.logout') }}" class="nav-link nav-link--logout">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="nav-link nav-link--primary">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content{% block main_class %}{% endblock %}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash flash--{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block scripts %}{% endblock %}
+    <script src="{{ url_for('static', filename='js/flashcard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/test.js') }}"></script>
+</body>
+</html>

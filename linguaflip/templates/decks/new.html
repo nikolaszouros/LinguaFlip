@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}New Deck - LinguaFlip{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Create New Deck</h1>
+    <a href="{{ url_for('decks.index') }}" class="btn btn--secondary">Back to Decks</a>
+</div>
+
+<div class="form-container">
+    <form method="post" class="form">
+        <div class="form-group">
+            <label for="name" class="form-label">Deck Name</label>
+            <input
+                type="text"
+                id="name"
+                name="name"
+                class="form-input"
+                placeholder="e.g. Spanish Basics, French Verbs"
+                required
+                autofocus
+            >
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="source_lang" class="form-label">Source Language (you know)</label>
+                <select id="source_lang" name="source_lang" class="form-input form-select" required>
+                    <option value="">Select language</option>
+                    {% for code, name in languages.items() %}
+                        <option value="{{ code }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="target_lang" class="form-label">Target Language (you're learning)</label>
+                <select id="target_lang" name="target_lang" class="form-input form-select" required>
+                    <option value="">Select language</option>
+                    {% for code, name in languages.items() %}
+                        <option value="{{ code }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn--primary">Create Deck</button>
+            <a href="{{ url_for('decks.index') }}" class="btn btn--secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

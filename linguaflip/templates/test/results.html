@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Test Results - LinguaFlip{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Test Results</h1>
+</div>
+
+<div class="results-container">
+    <div class="score-display">
+        <div class="score-circle">
+            <span class="score-number">{{ score }}</span>
+            <span class="score-divider">/</span>
+            <span class="score-total">{{ total }}</span>
+        </div>
+        <p class="score-percentage">
+            {% if total > 0 %}
+                {{ (score / total * 100) | round | int }}%
+            {% else %}
+                0%
+            {% endif %}
+        </p>
+        <p class="score-message">
+            {% if total > 0 %}
+                {% set pct = (score / total * 100) | round | int %}
+                {% if pct >= 90 %}Excellent work!
+                {% elif pct >= 70 %}Good job!
+                {% elif pct >= 50 %}Keep practising!
+                {% else %}Don't give up, keep studying!
+                {% endif %}
+            {% endif %}
+        </p>
+    </div>
+
+    <table class="results-table">
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Your Answer</th>
+                <th>Expected</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in results %}
+            <tr class="{{ 'result-row--correct' if r.correct else 'result-row--wrong' }}">
+                <td>{{ r.question }}</td>
+                <td>{{ r.given }}</td>
+                <td>{{ r.expected }}</td>
+                <td>
+                    {% if r.correct %}
+                        <span class="badge badge--success">Correct</span>
+                    {% else %}
+                        <span class="badge badge--error">Wrong</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="results-actions">
+        <a href="{{ url_for('decks.detail', deck_id=deck_id) }}" class="btn btn--secondary">Back to Deck</a>
+        <a href="{{ url_for('test_bp.index', deck_id=deck_id) }}" class="btn btn--primary">Try Again</a>
+    </div>
+</div>
+{% endblock %}

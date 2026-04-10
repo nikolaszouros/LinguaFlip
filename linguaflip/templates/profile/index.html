@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Profile - LinguaFlip{% endblock %}
+{% block content %}
+
+<!-- Profile Hero -->
+<div class="profile-hero">
+    <form method="post" enctype="multipart/form-data" id="pic-upload-form">
+        <div class="profile-avatar-wrap" title="Click to change photo">
+            {% if user.profile_pic %}
+            <img src="{{ url_for('static', filename='uploads/profiles/' + user.profile_pic) }}"
+                 class="profile-avatar profile-avatar--img" alt="{{ user.username }}">
+            {% else %}
+            <div class="profile-avatar">{{ user.username[0]|upper }}</div>
+            {% endif %}
+            <div class="profile-avatar__overlay">📷</div>
+            <input type="file" name="profile_pic" accept="image/jpeg,image/png,image/webp"
+                   id="profile-pic-input" style="display:none"
+                   onchange="document.getElementById('pic-upload-form').submit()">
+            <label for="profile-pic-input" class="profile-avatar__label"></label>
+        </div>
+    </form>
+    <div class="profile-hero__info">
+        <h1 class="profile-hero__name">{{ user.username }}</h1>
+        <p class="profile-hero__meta">Member since {{ user.created_at | fmt_dt }}</p>
+        <p class="profile-hero__hint">Click the photo to change it</p>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="profile-stats-grid">
+    <div class="profile-stat-card">
+        <span class="profile-stat__value">{{ decks | length }}</span>
+        <span class="profile-stat__label">Decks</span>
+    </div>
+    <div class="profile-stat-card">
+        <span class="profile-stat__value">{{ total_cards }}</span>
+        <span class="profile-stat__label">Cards</span>
+    </div>
+    <div class="profile-stat-card">
+        <span class="profile-stat__value">{{ total_tests }}</span>
+        <span class="profile-stat__label">Tests Taken</span>
+    </div>
+</div>
+
+<!-- Account + Language -->
+<div class="profile-section-grid">
+    <div class="profile-card">
+        <h2 class="profile-card__title">Account Details</h2>
+        <div class="profile-field">
+            <span class="profile-field__label">Username</span>
+            <span class="profile-field__value">{{ user.username }}</span>
+        </div>
+        <div class="profile-field">
+            <span class="profile-field__label">Email</span>
+            <span class="profile-field__value">{{ user.email }}</span>
+        </div>
+    </div>
+
+    <div class="profile-card">
+        <h2 class="profile-card__title">Native Language</h2>
+        <form method="post">
+            <div class="form-group">
+                <label for="native_lang" class="form-label">Your native language</label>
+                <select name="native_lang" id="native_lang" class="form-input form-select">
+                    {% for code, name in languages | dictsort(by='value') %}
+                        <option value="{{ code }}" {% if code == user.native_lang %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn--primary" style="margin-top:1rem">Save</button>
+        </form>
+    </div>
+</div>
+
+<!-- Decks -->
+{% if decks %}
+<div class="section">
+    <div class="section__header">
+        <h2>My Decks</h2>
+        <a href="{{ url_for('decks.new') }}" class="btn btn--secondary btn--sm">+ New Deck</a>
+    </div>
+    <div class="deck-grid">
+        {% for deck in decks %}
+        <a href="{{ url_for('decks.detail', deck_id=deck.id) }}" class="deck-card">
+            <div class="deck-card__name">{{ deck.name }}</div>
+            <div class="deck-card__langs">
+                {{ languages.get(deck.source_lang, deck.source_lang) }} &rarr; {{ languages.get(deck.target_lang, deck.target_lang) }}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <p>You haven't created any decks yet.</p>
+    <a href="{{ url_for('decks.new') }}" class="btn btn--primary">Create Your First Deck</a>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - LinguaFlip{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Dashboard</h1>
+</div>
+
+<div class="dashboard-stats">
+    <div class="dashboard-stat-card">
+        <span class="dashboard-stat__value">{{ total_decks }}</span>
+        <span class="dashboard-stat__label">Decks</span>
+    </div>
+    <div class="dashboard-stat-card">
+        <span class="dashboard-stat__value">{{ total_cards }}</span>
+        <span class="dashboard-stat__label">Total Cards</span>
+    </div>
+    <div class="dashboard-stat-card">
+        <span class="dashboard-stat__value">{{ history | length }}</span>
+        <span class="dashboard-stat__label">Recent Tests</span>
+    </div>
+    <div class="dashboard-stat-card dashboard-stat-card--accent">
+        <span class="dashboard-stat__value">{{ streak }}</span>
+        <span class="dashboard-stat__label">Day Streak</span>
+    </div>
+</div>
+
+<div class="section">
+    <h2>Recent Test History</h2>
+    {% if history %}
+        <table class="card-table">
+            <thead>
+                <tr>
+                    <th>Deck</th>
+                    <th>Score</th>
+                    <th>Percentage</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in history %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('decks.detail', deck_id=entry.deck_id) }}" class="link">
+                            {{ entry.deck_name }}
+                        </a>
+                    </td>
+                    <td>{{ entry.score }} / {{ entry.total }}</td>
+                    <td>
+                        <span class="badge {% if entry.pct >= 70 %}badge--success{% elif entry.pct >= 50 %}badge--warning{% else %}badge--error{% endif %}">
+                            {{ entry.pct }}%
+                        </span>
+                    </td>
+                    <td>{{ entry.taken_at | fmt_dt }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <p>No tests taken yet. Start studying to see your progress here!</p>
+            <a href="{{ url_for('decks.index') }}" class="btn btn--primary">View Decks</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

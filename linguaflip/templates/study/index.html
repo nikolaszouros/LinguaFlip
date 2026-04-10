@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Study: {{ deck.name }} - LinguaFlip{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Studying: {{ deck.name }}</h1>
+    <a href="{{ url_for('decks.detail', deck_id=deck.id) }}" class="btn btn--secondary">Exit</a>
+</div>
+
+<div class="study-container">
+    <div class="study-progress">
+        <span id="card-counter" class="counter">1 / {{ card_count }}</span>
+    </div>
+
+    <div class="flashcard-scene" id="flashcard-scene">
+        <div class="flashcard" id="flashcard">
+            <div class="flashcard__face flashcard__face--front">
+                <p id="card-front" class="flashcard__text"></p>
+                <span class="flashcard__hint">Click to flip</span>
+            </div>
+            <div class="flashcard__face flashcard__face--back">
+                <p id="card-back" class="flashcard__text"></p>
+                <span class="flashcard__hint">Click to flip back</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="study-controls">
+        <button id="prev-btn" class="btn btn--secondary" onclick="prevCard()">Previous</button>
+        <button id="flip-btn" class="btn btn--primary" onclick="flipCard()">Flip</button>
+        <button id="next-btn" class="btn btn--secondary" onclick="nextCard()">Next</button>
+    </div>
+
+    <div class="study-footer">
+        <a href="{{ url_for('test_bp.index', deck_id=deck.id) }}" class="btn btn--secondary">Take a Test</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const CARDS = {{ cards_json | safe }};
+</script>
+{% endblock %}

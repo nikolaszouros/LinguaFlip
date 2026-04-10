@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Add Card - LinguaFlip{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Add Card to "{{ deck.name }}"</h1>
+    <a href="{{ url_for('decks.detail', deck_id=deck.id) }}" class="btn btn--secondary">Back to Deck</a>
+</div>
+
+<div class="form-container">
+    <form method="post" class="form" id="card-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="front" class="form-label">
+                    Front — {{ deck.source_lang | upper }}
+                </label>
+                <textarea
+                    id="front"
+                    name="front"
+                    class="form-input form-textarea"
+                    placeholder="Word or phrase in {{ deck.source_lang }}"
+                    required
+                    autofocus
+                ></textarea>
+            </div>
+            <div class="form-group">
+                <label for="back" class="form-label">
+                    Back — {{ deck.target_lang | upper }}
+                    <span id="translate-status" class="translate-status"></span>
+                </label>
+                <textarea
+                    id="back"
+                    name="back"
+                    class="form-input form-textarea"
+                    placeholder="Translation in {{ deck.target_lang }}"
+                    required
+                ></textarea>
+            </div>
+        </div>
+
+        <div class="translate-bar">
+            <button type="button" id="translate-btn" class="btn btn--translate">
+                Translate with AI
+            </button>
+            <span class="translate-note">Auto-fills the translation from Gemini — you can still edit it.</span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn--primary">Add Card</button>
+            <button type="submit" name="add_another" value="1" class="btn btn--secondary">Add &amp; Another</button>
+            <a href="{{ url_for('decks.detail', deck_id=deck.id) }}" class="btn btn--secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    var TRANSLATE_URL = "{{ url_for('cards.translate', deck_id=deck.id) }}";
+
+    var btn    = document.getElementById('translate-btn');
+    var front  = document.getElementById('front');
+    var back   = document.getElementById('back');
+    var status = document.getElementById('translate-status');
+
+    btn.addEventListener('click', function () {
+        var word = front.value.trim();
+        if (!word) {
+            front.focus();
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Translating…';
+        status.textContent = '';
+
+        fetch(TRANSLATE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ word: word })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.translation) {
+                back.value = data.translation;
+                status.textContent = '✓ translated';
+                status.className = 'translate-status translate-status--ok';
+            } else {
+                status.textContent = data.error || 'Translation failed';
+                status.className = 'translate-status translate-status--err';
+            }
+        })
+        .catch(function () {
+            status.textContent = 'Network error';
+            status.className = 'translate-status translate-status--err';
+        })
+        .finally(function () {
+            btn.disabled = false;
+            btn.textContent = 'Translate with AI';
+        });
+    });
+}());
+</script>
+{% endblock %}

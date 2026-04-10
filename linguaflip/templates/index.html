@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}LinguaFlip — Learn Languages with Flashcards{% endblock %}
+{% block main_class %} main-content--welcome{% endblock %}
+
+{% block content %}
+<div class="welcome-wrap">
+
+    <div class="welcome-hero">
+        <div class="welcome-hero__inner">
+            {% if current_user %}
+            <h1 class="welcome-title">
+                Welcome back,<br>
+                <span class="welcome-brand-name">{{ current_user.username }}!</span>
+            </h1>
+            <p class="welcome-subtitle">
+                Ready to continue learning? Pick up where you left off.
+            </p>
+            <div class="welcome-cta">
+                <a href="{{ url_for('decks.index') }}" class="btn btn--lg btn--cta-signup">
+                    My Decks
+                </a>
+                <a href="{{ url_for('decks.dashboard') }}" class="btn btn--lg btn--cta-login">
+                    Dashboard
+                </a>
+            </div>
+            {% else %}
+            <h1 class="welcome-title">
+                Welcome to<br>
+                <span class="welcome-brand-name">LinguaFlip</span>
+            </h1>
+            <p class="welcome-subtitle">
+                Master vocabulary in any language with intelligent flashcards
+                and AI-powered suggestions.
+            </p>
+            <div class="welcome-cta">
+                <a href="{{ url_for('auth.register') }}" class="btn btn--lg btn--cta-signup">
+                    Sign Up Free
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn--lg btn--cta-login">
+                    Log In
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if current_user %}
+    <div class="welcome-actions">
+        <a href="{{ url_for('decks.index') }}" class="action-card">
+            <div class="action-card__icon">📚</div>
+            <div class="action-card__title">My Decks</div>
+            <div class="action-card__desc">View and manage your flashcard decks</div>
+        </a>
+        <a href="{{ url_for('decks.dashboard') }}" class="action-card">
+            <div class="action-card__icon">📊</div>
+            <div class="action-card__title">Dashboard</div>
+            <div class="action-card__desc">Track your streaks, scores, and learning history</div>
+        </a>
+        <a href="{{ url_for('profile.index') }}" class="action-card">
+            <div class="action-card__icon">👤</div>
+            <div class="action-card__title">Profile</div>
+            <div class="action-card__desc">Update your account and language settings</div>
+        </a>
+        <div class="action-card action-card--test">
+            <div class="action-card__icon">🎯</div>
+            <div class="action-card__title">Test a Deck</div>
+            <div class="action-card__desc">Select a deck and start a test session</div>
+            {% if user_decks %}
+            <div class="action-card__form">
+                <select id="test-deck-select" class="form-input form-select action-card__select">
+                    <option value="">Choose a deck…</option>
+                    {% for deck in user_decks %}
+                    <option value="{{ url_for('test_bp.index', deck_id=deck.id) }}">{{ deck.name }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn--primary btn--sm" onclick="startTest()">Go</button>
+            </div>
+            {% else %}
+            <p class="action-card__hint">No decks yet — <a href="{{ url_for('decks.new') }}">create one first</a></p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% else %}
+    <div class="welcome-features">
+        <div class="welcome-feature">
+            <div class="welcome-feature__icon">📚</div>
+            <div>
+                <div class="welcome-feature__title">Custom Decks</div>
+                <div class="welcome-feature__desc">Create flashcard decks for any language pair you want to learn</div>
+            </div>
+        </div>
+        <div class="welcome-feature">
+            <div class="welcome-feature__icon">🤖</div>
+            <div>
+                <div class="welcome-feature__title">AI Suggestions</div>
+                <div class="welcome-feature__desc">Get smart vocabulary recommendations powered by Claude AI</div>
+            </div>
+        </div>
+        <div class="welcome-feature">
+            <div class="welcome-feature__icon">📊</div>
+            <div>
+                <div class="welcome-feature__title">Track Progress</div>
+                <div class="welcome-feature__desc">Dashboard with streaks, test scores, and learning history</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+{% if current_user %}
+<script>
+function startTest() {
+    const select = document.getElementById('test-deck-select');
+    if (select.value) window.location.href = select.value;
+}
+</script>
+{% endif %}
+{% endblock %}

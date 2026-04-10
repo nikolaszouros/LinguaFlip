@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Register - LinguaFlip{% endblock %}
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h1 class="auth-title">Create Account</h1>
+        <p class="auth-subtitle">Start your language learning journey</p>
+
+        <form method="post" class="form">
+            <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" id="username" name="username" class="form-input"
+                       placeholder="Choose a username" required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" class="form-input"
+                       placeholder="your@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="native_lang" class="form-label">Native Language</label>
+                <select id="native_lang" name="native_lang" class="form-input form-select">
+                    {% for code, name in languages | dictsort(by='value') %}
+                    <option value="{{ code }}" {% if code == 'en' %}selected{% endif %}>
+                        {{ name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-input"
+                       placeholder="At least 6 characters" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password"
+                       class="form-input" placeholder="Repeat your password" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn--full">Create Account</button>
+        </form>
+
+        <p class="auth-footer">
+            Already have an account?
+            <a href="{{ url_for('auth.login') }}" class="link">Log in here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
