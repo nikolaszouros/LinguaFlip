@@ -69,9 +69,6 @@ def create_app():
     from db.database import init_db, close_db
 
     with app.app_context():
-        # Ensure profile picture uploads directory exists
-        os.makedirs(os.path.join(app.static_folder, 'uploads', 'profiles'), exist_ok=True)
-
         try:
             init_db()
         except Exception as e:
