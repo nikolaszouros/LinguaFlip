@@ -64,3 +64,9 @@ logs/
 
 # ── Claude Code ──────────────────────────────────────────────────────
 .claude/
+
+# ── Vercel ──────────────────────────────────────────────────────
+node_modules
+package-lock.json
+package.json
+vercel.json
