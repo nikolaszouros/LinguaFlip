@@ -11,8 +11,8 @@ def _lang_name(code):
 
 
 class AIService:
-    def __init__(self, api_key):
-        self.api_key = os.environ.get('GEMINI_API_KEY')
+    def __init__(self, api_key=None):
+        self.api_key = api_key or os.environ.get('GEMINI_API_KEY')
         if self.api_key:
             self.client = genai.Client(api_key=self.api_key)
         else:
